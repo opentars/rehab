@@ -1,0 +1,95 @@
+/* Rehab Lite — phone-first (390px), big text, one-hand use. */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; background: #0b0d10; color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+input, textarea { font: inherit; }
+
+#app { max-width: 28rem; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+
+.header { position: sticky; top: 0; z-index: 20; background: rgba(11,13,16,.95);
+  backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,.1);
+  padding: calc(env(safe-area-inset-top) + 12px) 16px 12px; display: flex;
+  align-items: center; justify-content: space-between; }
+.header h1 { font-size: 18px; font-weight: 800; letter-spacing: .05em; margin: 0; color: #38bdf8; }
+
+.main { flex: 1; padding: 12px 12px 110px; }
+.stack > * + * { margin-top: 12px; }
+
+.card { border-radius: 12px; background: #161a20; border: 1px solid rgba(255,255,255,.1); padding: 16px; }
+.card.streak-lit { background: rgba(67,20,7,.5); border-color: rgba(249,115,22,.4); }
+.card.green { background: rgba(6,46,32,.5); border-color: rgba(16,185,129,.4); }
+
+.streak { display: flex; align-items: center; gap: 12px; }
+.streak .fire { font-size: 40px; }
+.streak .big { font-size: 26px; font-weight: 900; line-height: 1.1; color: #fdba74; }
+.streak .big.off { color: rgba(255,255,255,.5); }
+.streak .sub { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+.rname { font-size: 20px; font-weight: 900; }
+.rmeta { font-size: 14px; font-weight: 700; color: rgba(255,255,255,.7); display: flex; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+.rcue { margin-top: 8px; border-radius: 10px; background: rgba(69,26,3,.4); border: 1px solid rgba(245,158,11,.3);
+  padding: 10px; color: #fcd34d; font-size: 14px; font-weight: 600; }
+.rstat { font-size: 13px; font-weight: 800; margin-top: 8px; }
+.rstat .ok { color: #34d399; } .rstat .wait { color: #fbbf24; } .rstat .done { color: rgba(255,255,255,.35); }
+
+.btn { display: block; width: 100%; border-radius: 16px; text-align: center; font-weight: 900; }
+.btn-start { background: #059669; padding: 18px; font-size: 22px; margin-top: 12px; }
+.btn-start:active { background: #10b981; }
+.btn-start.amber { background: #b45309; }
+.btn-ghost { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); padding: 12px; font-size: 14px; color: rgba(255,255,255,.7); }
+.btn-danger { background: rgba(127,29,29,.6); color: #fecaca; padding: 14px; font-size: 16px; }
+
+.small { font-size: 12px; color: rgba(255,255,255,.4); }
+.center { text-align: center; }
+.label { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: rgba(255,255,255,.45); margin-bottom: 6px; text-transform: uppercase; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { width: 46px; height: 46px; border-radius: 12px; font-weight: 900; font-size: 17px;
+  background: #161a20; border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.7); }
+.chip.sel { background: #fff; color: #000; }
+
+.field { margin-top: 10px; }
+.field label { display: block; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+.field input, .field textarea { width: 100%; border-radius: 10px; background: rgba(0,0,0,.3);
+  border: 1px solid rgba(255,255,255,.12); color: #fff; padding: 12px; font-size: 17px; }
+
+.tabs { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; background: #12151a;
+  border-top: 1px solid rgba(255,255,255,.1); padding-bottom: env(safe-area-inset-bottom); }
+.tabs .row { max-width: 28rem; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; }
+.tabs button { padding: 16px 0; font-size: 14px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: rgba(255,255,255,.4); }
+.tabs button.on { color: #38bdf8; }
+
+/* ---- full-screen timer ---- */
+.full { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top); background: #0b0d10; transition: background .3s; }
+.full.hold { background: #065f46; }
+.full.rest { background: #101c33; }
+.full.overdue { background: #991b1b; }
+.timer-top { padding: 8px 16px 0; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+.timer-top .tname { font-weight: 700; color: rgba(255,255,255,.7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini { font-size: 14px; font-weight: 900; border-radius: 12px; padding: 12px 14px; min-height: 44px; touch-action: manipulation; background: rgba(0,0,0,.4); color: #fff; }
+.mini.off { background: rgba(0,0,0,.2); color: rgba(255,255,255,.3); text-decoration: line-through; }
+.timer-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+.phase-word { font-size: 34px; font-weight: 900; letter-spacing: .12em; color: rgba(255,255,255,.9); }
+.count { font-size: 8rem; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; }
+.tapnow { font-size: 20px; font-weight: 900; color: #fecaca; margin-top: 8px; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: .4; } }
+.round { margin-top: 16px; font-size: 22px; font-weight: 700; color: rgba(255,255,255,.8); }
+.elapsed { margin-top: 4px; font-size: 18px; font-weight: 700; color: rgba(255,255,255,.6); font-variant-numeric: tabular-nums; }
+.elapsed.warn { color: #fca5a5; }
+.ceiling-warn { margin-top: 8px; border-radius: 8px; background: rgba(127,29,29,.7);
+  border: 1px solid rgba(248,113,113,.5); padding: 4px 12px; font-size: 13px; font-weight: 900; color: #fee2e2; }
+.timer-actions { padding: 16px; padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.timer-actions button { border-radius: 16px; padding: 20px 0; font-size: 20px; font-weight: 900; background: rgba(0,0,0,.3); }
+.timer-actions .end { background: rgba(0,0,0,.4); color: #fecaca; }
+
+.toggle-row { display: flex; gap: 8px; margin-top: 12px; }
+.toggle-row button { flex: 1; border-radius: 12px; padding: 12px 0; font-size: 14px; font-weight: 900;
+  background: #161a20; border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.4); }
+.toggle-row button.on { background: rgba(5,150,105,.2); border-color: rgba(16,185,129,.5); color: #6ee7b7; }
+
+svg.chart { width: 100%; height: auto; display: block; }
