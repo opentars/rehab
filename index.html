@@ -16,9 +16,20 @@
 <div id="app"></div>
 <script src="app.js"></script>
 <script>
-// offline install: after first load the app runs entirely on this device
+// offline install: after first load the app runs entirely on this device.
+// When an update finishes installing, reload once so new features show up on
+// THIS open instead of the next one. Never reload while a timer is running,
+// and not on the very first install (no old controller to replace).
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  var hadController = !!navigator.serviceWorker.controller;
+  var reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (!hadController || reloaded) return;
+    if (localStorage.getItem('rl.timer')) return;
+    reloaded = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').catch(function () {});
 }
 </script>
 </body>
