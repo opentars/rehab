@@ -239,7 +239,7 @@ function homeHtml() {
       <button class="btn btn-start" data-act="new">NAME MY EXERCISE</button>
     </div>` : '';
 
-  return `${streakCard}${emptyState}${cards}
+  return `${streakCard}${quickStartHtml()}${emptyState}${cards}
     ${routines.length ? '<button class="btn btn-ghost" data-act="new">+ Add another exercise</button>' : ''}
     ${helpHtml()}
     <p class="small center" style="padding: 8px 12px 20px">
@@ -252,6 +252,92 @@ function homeHtml() {
 
 // Copy rules (Boss): no em-dashes, short paragraphs split by blank lines,
 // as few words as possible. helpHtml() renders each blank line as a break.
+
+// Quick Start: the absolute basics, shown above the exercises.
+const QUICK_START = [
+  ['What is an isometric?',
+   'Push or pull against something that does not move, and hold still.\n\nNo reps. No motion. Just gentle tension.'],
+  ['How hard do I hold?',
+   '2 out of 10. It should feel almost too easy.\n\nWhen in doubt: do the movement that hurts, at 1 out of 10. You should barely feel it.'],
+  ['What should I NOT do?',
+   'Do not push into sharp pain.\n\nDo not bounce or move during a hold.\n\nDo not go past the 10 minutes. More is not better.'],
+  ['Then what?',
+   'That’s it. Tap START and follow the colors and beeps.\n\nThe app does the rest.'],
+];
+
+// One simple exercise idea per tendon, with a built-in diagram (SVG, offline,
+// no copyright). Figure style: white stick figure, amber = the sore spot,
+// blue arrow = where the gentle push goes.
+const FIG = {
+  open: '<svg viewBox="0 0 200 160" class="idea-fig" fill="none" stroke="#e5e7eb" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">',
+  close: '</svg>',
+  hl: 'stroke="#f59e0b" stroke-width="6"',
+  ar: 'stroke="#38bdf8" stroke-width="4"',
+};
+
+const WORKOUT_IDEAS = [
+  ['Achilles: standing calf hold',
+   `${FIG.open}
+    <path d="M20 150 H180"/><path d="M170 20 V150" stroke-width="4"/>
+    <circle cx="95" cy="30" r="9"/><path d="M95 39 V95"/>
+    <path d="M95 55 L165 62"/>
+    <path d="M95 95 L100 120 L102 138"/>
+    <path d="M102 138 L92 147"/><path d="M102 138 L116 150"/>
+    <path d="M102 122 L94 144" ${FIG.hl}/>
+    <path d="M82 142 V122 M82 122 L78 128 M82 122 L86 128" ${FIG.ar}/>
+    ${FIG.close}`,
+   'Stand on the sore leg and lift the heel off the floor. Hold the wall for balance.\n\nHold still. 2 out of 10.'],
+  ['Knee: split squat hold',
+   `${FIG.open}
+    <path d="M15 150 H185"/>
+    <circle cx="85" cy="28" r="9"/><path d="M85 37 L90 88"/>
+    <path d="M86 52 L100 75"/>
+    <path d="M90 88 L122 100 L126 145"/><path d="M114 150 H142"/>
+    <path d="M90 88 L65 115 L58 145 L48 150"/>
+    <circle cx="122" cy="100" r="9" ${FIG.hl}/>
+    ${FIG.close}`,
+   'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.'],
+  ['Wrist: table press hold',
+   `${FIG.open}
+    <path d="M40 150 H195"/><path d="M60 105 H185"/><path d="M70 105 V150 M175 105 V150" stroke-width="4"/>
+    <circle cx="40" cy="30" r="9"/><path d="M44 38 L60 62"/>
+    <path d="M60 62 L88 78 L120 98"/><path d="M120 98 L142 104"/>
+    <circle cx="124" cy="99" r="7" ${FIG.hl}/>
+    <path d="M155 72 V92 M155 92 L151 86 M155 92 L159 86" ${FIG.ar}/>
+    ${FIG.close}`,
+   'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.'],
+  ['Hip flexor: seated knee press',
+   `${FIG.open}
+    <path d="M20 150 H180"/>
+    <path d="M60 105 H115 M62 105 V55 M112 105 V150 M64 105 V150" stroke-width="4"/>
+    <circle cx="98" cy="32" r="9"/><path d="M98 41 V103"/>
+    <path d="M98 103 L132 90 V138"/><path d="M126 142 H140"/>
+    <path d="M98 55 L128 86"/>
+    <circle cx="104" cy="99" r="7" ${FIG.hl}/>
+    <path d="M155 108 V92 M155 92 L151 97 M155 92 L159 97" ${FIG.ar}/>
+    ${FIG.close}`,
+   'Sit down. Lift the sore side knee a little. Press your hand down on top of it.\n\nLeg pushes up, hand pushes down. Nothing moves.'],
+  ['Glutes / side of hip: bridge hold',
+   `${FIG.open}
+    <path d="M15 145 H185"/>
+    <circle cx="40" cy="132" r="9"/>
+    <path d="M52 138 L110 105"/><path d="M110 105 L138 112 L142 143"/><path d="M132 145 H150"/>
+    <path d="M60 140 H95"/>
+    <circle cx="112" cy="108" r="8" ${FIG.hl}/>
+    <path d="M118 95 V78 M118 78 L114 84 M118 78 L122 84" ${FIG.ar}/>
+    ${FIG.close}`,
+   'Lie on your back, knees bent. Lift your hips a little and hold.\n\nSore on the outside of the hip is usually a glute tendon. This is real and this helps.\n\nNew hip? Keep it tiny, and clear it with your doctor.'],
+  ['Elbow / triceps: table push down',
+   `${FIG.open}
+    <path d="M20 150 H180"/><path d="M110 100 H180"/><path d="M118 100 V150 M170 100 V150" stroke-width="4"/>
+    <circle cx="70" cy="25" r="9"/><path d="M70 34 V95"/>
+    <path d="M70 95 L64 148 M70 95 L78 148"/>
+    <path d="M70 48 L95 72 L128 97"/>
+    <path d="M75 44 L99 67" ${FIG.hl}/>
+    <path d="M145 70 V90 M145 90 L141 84 M145 90 L149 84" ${FIG.ar}/>
+    ${FIG.close}`,
+   'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.'],
+];
 const HOW_TO = [
   ['How do I start?',
    'Tap NAME MY EXERCISE and type the body part. Wrist, elbow, knee, anything.\n\nTap START. Green means gently tense that spot. Blue means relax.\n\nThe beeps say the same thing, so you don’t have to watch the screen.'],
@@ -286,19 +372,41 @@ const FAQ = [
    'Tendon research from Dr. Keith Baar’s lab at UC Davis.\n\nThe gentle holds, the 10 minute cap, and the spaced doses all come from how tendon cells respond to load.\n\nThe app just does the counting.'],
 ];
 
-function helpHtml() {
-  const paras = (a) => a.split('\n\n').map((p) => `<p>${p}</p>`).join('');
-  const items = (list) => list.map(([q, a]) => `
-    <details class="faq-item"><summary>${q}</summary>${paras(a)}</details>`).join('');
+const paras = (a) => a.split('\n\n').map((p) => `<p>${p}</p>`).join('');
+const accordion = (list) => list.map(([q, a]) => `
+  <details class="faq-item"><summary>${q}</summary>${paras(a)}</details>`).join('');
+
+function quickStartHtml() {
   return `
     <div class="card">
-      <div class="rname">How do I use the app?</div>
-      ${items(HOW_TO)}
-    </div>
+      <div class="rname">Quick Start</div>
+      <p class="small" style="margin:6px 0 2px">New here? These four. Then the app does the rest.</p>
+      ${accordion(QUICK_START)}
+    </div>`;
+}
+
+function ideasHtml() {
+  const items = WORKOUT_IDEAS.map(([title, svg, text]) => `
+    <details class="faq-item"><summary>${title}</summary>${svg}${paras(text)}</details>`).join('');
+  return `
+    <div class="card">
+      <div class="rname">Workout ideas: one per spot</div>
+      <p class="small" style="margin:6px 0 2px">Tap yours to see the picture. Amber = the sore spot. Blue arrow = the gentle push.</p>
+      ${items}
+    </div>`;
+}
+
+function helpHtml() {
+  return `
+    ${ideasHtml()}
     <div class="card">
       <div class="rname">FAQ: the why behind it</div>
       <p class="small" style="margin:6px 0 2px">These rules come from tendon science. Tap a question.</p>
-      ${items(FAQ)}
+      ${accordion(FAQ)}
+    </div>
+    <div class="card">
+      <div class="rname">How do I use the app?</div>
+      ${accordion(HOW_TO)}
     </div>`;
 }
 
