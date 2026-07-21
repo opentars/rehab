@@ -341,6 +341,17 @@ const WORKOUT_IDEAS = [
     <path d="M148 60 V80 M148 80 L144 74 M148 80 L152 74" ${FIG.ar}/>
     ${FIG.close}`,
    'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.'],
+  ['Grip 🥋: the no hang (beast mode)',
+   `${FIG.open}
+    <path d="M20 150 H180"/>
+    <path d="M118 25 V150 M162 25 V150 M108 25 H172" stroke-width="4"/>
+    <circle cx="95" cy="58" r="9"/><path d="M95 67 V110"/>
+    <path d="M95 110 L87 130 L90 148 M95 110 L104 130 L101 148"/>
+    <path d="M95 72 L116 30 M95 72 L128 30"/>
+    <circle cx="116" cy="28" r="6" ${FIG.hl}/><circle cx="128" cy="28" r="6" ${FIG.hl}/>
+    <path d="M145 42 V60 M145 60 L141 54 M145 60 L149 54" ${FIG.ar}/>
+    ${FIG.close}`,
+   'This one is not rehab. This one is for grip.\n\nGrab a door frame, a ledge, or a pull up bar. Pull down with your fingers, but your feet never leave the floor. A pull up where you never go up.\n\nPull firm, nowhere near max. Light is the trick.\n\nA pro climber tested this exact routine, 10 minutes twice a day. His grip went up 19 kilos in 30 days. About 40 percent more load.\n\nJiu jitsu people: this is grip fighting fuel. Same timer, same 2 a day. Beast mode, gently.'],
 ];
 const HOW_TO = [
   ['How do I start?',
@@ -374,6 +385,8 @@ const FAQ = [
    'Sharp pain means wrong angle or too much effort.\n\nChange the position and lighten up. Stay just under the pain.'],
   ['Do I need weights or equipment?',
    'No. Gently pushing against anything that doesn’t move is enough.\n\nA table, a wall, your other hand.'],
+  ['Can I use this to get STRONGER, not just heal?',
+   'Yes. Tendons grow from short spaced doses either way, hurt or not.\n\nSee the no hang in Workout ideas. That one is pure strength. Grip for jiu jitsu, climbing, opening jars, everything.\n\nSame timer. Same 2 a day.'],
   ['Where does this come from?',
    'Tendon research from Dr. Keith Baar’s lab at UC Davis.\n\nThe gentle holds, the 10 minute cap, and the spaced doses all come from how tendon cells respond to load.\n\nThe app just does the counting.'],
 ];
