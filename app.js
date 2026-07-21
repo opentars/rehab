@@ -239,10 +239,62 @@ function homeHtml() {
 
   return `${streakCard}${emptyState}${cards}
     ${routines.length ? '<button class="btn btn-ghost" data-act="new">+ Add another exercise</button>' : ''}
+    ${helpHtml()}
     <p class="small center" style="padding: 8px 12px 20px">
       The timer beeps even if your phone is on silent. Keep the effort gentle —
       it should never hurt while you do it.
     </p>`;
+}
+
+/* ---------- how-to + FAQ (plain English — family has never heard of any of this) ---------- */
+
+const HOW_TO = [
+  ['How do I start?',
+   'Tap NAME MY EXERCISE and type the body part that bothers you — wrist, elbow, knee, anything. Then tap START. The screen turns green when it’s time to gently tense that spot, and blue when it’s time to relax. The beeps tell you the same thing, so you don’t have to watch the screen.'],
+  ['What do HOLD and REST mean?',
+   'HOLD (green, 30 seconds): gently tense the sore area and keep it still — like pressing lightly against something that doesn’t move. REST (blue, 60 seconds): let go completely. That’s the whole exercise. The app repeats it for you until 10 minutes are up.'],
+  ['What is the NONSTOP button?',
+   'With NONSTOP on, the timer moves to the next hold or rest by itself. With it off, it beeps and waits for you to tap the screen — nice if you need a second to get in position.'],
+  ['What is the 0–10 question?',
+   'Once a day, tap the number for how that body part feels — 0 means perfect, 10 means the worst. It takes one second and builds your chart on the Trends page so you can actually SEE it getting better over the weeks.'],
+  ['What is the fire 🔥 thing?',
+   'Your streak. The goal is 2 short sessions a day, at least 6 hours apart. Every day you hit that, the streak grows. Consistency is the whole game with tendons.'],
+  ['Does it work on silent? Offline?',
+   'Yes and yes. The beeps play even when your phone is on silent. And after the first time you open it, the app works with no internet at all. Everything you do stays on YOUR phone — nobody else can see it.'],
+];
+
+const FAQ = [
+  ['How hard should I push?',
+   'Barely — about a 2 out of 10. This is the part nobody believes: healing a tendon is a light switch, not a workout. Gentle tension already flips the switch all the way on. Pushing harder does NOT heal it faster — it can actually set you back. If it hurts while you’re doing it, ease off until it doesn’t.'],
+  ['Why does the timer keep running even if I pause?',
+   'Because your cells don’t pause. The moment you do the first hold, your tendon cells start their response — and that biological clock runs for about 10 minutes whether you’re exercising, resting, or answering the phone. Pausing the countdown doesn’t pause your body, so the big 10-minute clock never stops.'],
+  ['Why only 10 minutes?',
+   'Research shows tendon cells stop listening after roughly 10 minutes of signaling. Minute 11 adds zero healing — just wear. Short and done beats long and heroic. When the app cuts you off, that’s it working.'],
+  ['Why twice a day, 6 hours apart?',
+   'After one 10-minute dose, the cells need about 6 hours to reset before they’ll respond again. Two spaced doses a day does more than one long session ever could. That’s why the app tracks the gap for you.'],
+  ['How long until it feels better?',
+   'Tendons are slow. Think weeks to a few months, not days. That’s normal — don’t quit at day 5. Watch the Trends chart instead of judging by one bad morning; the line drifting down over weeks is the win.'],
+  ['What if it hurts while I do it?',
+   'Sharp pain means wrong angle or too much effort — not "no pain no gain." Change the position, lighten up, and stay just under the pain. Mild tension is all it takes.'],
+  ['Do I need weights or equipment?',
+   'No. Gently pushing against anything that doesn’t move — a table, a wall, your other hand — is enough to flip the healing switch.'],
+  ['Where does this come from?',
+   'It’s based on tendon research from Dr. Keith Baar’s lab at UC Davis — the short gentle holds, the 10-minute cap, and the spaced doses all come from how tendon cells actually respond to load. The app just does the counting for you.'],
+];
+
+function helpHtml() {
+  const items = (list) => list.map(([q, a]) => `
+    <details class="faq-item"><summary>${q}</summary><p>${a}</p></details>`).join('');
+  return `
+    <div class="card">
+      <div class="rname">How do I use the app?</div>
+      ${items(HOW_TO)}
+    </div>
+    <div class="card">
+      <div class="rname">FAQ — the why behind it</div>
+      <p class="small" style="margin:6px 0 2px">The rules in this app aren’t random — they come from tendon science. Tap a question.</p>
+      ${items(FAQ)}
+    </div>`;
 }
 
 /* ---------- routine editor ---------- */

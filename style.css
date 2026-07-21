@@ -93,3 +93,14 @@ input, textarea { font: inherit; }
 .toggle-row button.on { background: rgba(5,150,105,.2); border-color: rgba(16,185,129,.5); color: #6ee7b7; }
 
 svg.chart { width: 100%; height: auto; display: block; }
+
+/* ---- how-to / FAQ accordions ---- */
+.faq-item { border-top: 1px solid rgba(255,255,255,.08); }
+.faq-item:first-of-type { margin-top: 10px; }
+.faq-item summary { padding: 14px 4px; font-size: 16px; font-weight: 700; color: rgba(255,255,255,.85);
+  cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center;
+  touch-action: manipulation; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '+'; font-size: 20px; font-weight: 900; color: #38bdf8; margin-left: 8px; }
+.faq-item[open] summary::after { content: '\2212'; }
+.faq-item p { margin: 0 4px 14px; font-size: 15px; line-height: 1.45; color: rgba(255,255,255,.65); }
