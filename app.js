@@ -31,15 +31,9 @@ const todayStr = (t) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 
+// No preset exercise — everyone names their own on first use (Boss 2026-07-21).
 function seedIfEmpty() {
-  if (store.get('routines') == null) {
-    store.set('routines', [{
-      id: uid(),
-      name: 'Wrist (top side)',
-      hold: 30, rest: 60, ceiling: 600,
-      cue: 'Gentle. Stay under the pain — mild tension only, never push into the sharp spot. If it hurts, back the angle off.',
-    }]);
-  }
+  if (store.get('routines') == null) store.set('routines', []);
   if (store.get('sessions') == null) store.set('sessions', []);
   if (store.get('checkins') == null) store.set('checkins', []);
   if (store.get('settings') == null) store.set('settings', { goalPerDay: 2, gapHours: 6 });
@@ -173,7 +167,7 @@ function render() {
   if (doneInfo) return renderDone();
   if (editing) return renderEditor();
   app.innerHTML = `
-    <div class="header"><h1>REHAB</h1><span class="small">${todayStr()}</span></div>
+    <div class="header"><h1>TENDON REHAB &amp; STRENGTHEN</h1><span class="small">${todayStr()}</span></div>
     <div class="main stack">${tab === 'home' ? homeHtml() : trendsHtml()}</div>
     <div class="tabs"><div class="row">
       <button class="${tab === 'home' ? 'on' : ''}" data-act="tab" data-tab="home">Timer</button>
@@ -233,8 +227,18 @@ function homeHtml() {
     </div>`;
   }).join('');
 
-  return `${streakCard}${cards}
-    <button class="btn btn-ghost" data-act="new">+ Add your own exercise</button>
+  const emptyState = routines.length === 0 ? `
+    <div class="card">
+      <div class="rname">What are you working on?</div>
+      <p style="font-size:15px; color: rgba(255,255,255,.7); margin: 8px 0 4px">
+        Name the body part that's bothering you — wrist, elbow, knee, ankle,
+        anything — and the timer takes care of the rest.
+      </p>
+      <button class="btn btn-start" data-act="new">NAME MY EXERCISE</button>
+    </div>` : '';
+
+  return `${streakCard}${emptyState}${cards}
+    ${routines.length ? '<button class="btn btn-ghost" data-act="new">+ Add another exercise</button>' : ''}
     <p class="small center" style="padding: 8px 12px 20px">
       The timer beeps even if your phone is on silent. Keep the effort gentle —
       it should never hurt while you do it.
@@ -252,7 +256,7 @@ function renderEditor() {
     <div class="main stack">
       <div class="card">
         <div class="field"><label>Name (what body part / movement)</label>
-          <input id="f-name" value="${esc(r.name || '')}" placeholder="e.g. Wrist (top side)"></div>
+          <input id="f-name" value="${esc(r.name || '')}" placeholder="e.g. Wrist, Elbow, Achilles"></div>
         <div class="field"><label>Hold — seconds of gentle effort</label>
           <input id="f-hold" type="number" inputmode="numeric" value="${r.hold ?? 30}"></div>
         <div class="field"><label>Rest — seconds between holds</label>

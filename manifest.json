@@ -1,6 +1,6 @@
 {
-  "name": "Rehab",
-  "short_name": "Rehab",
+  "name": "The Tendon App",
+  "short_name": "Tendon App",
   "display": "standalone",
   "start_url": "./",
   "background_color": "#0b0d10",
