@@ -66,6 +66,7 @@ input, textarea { font: inherit; }
 .full { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column;
   padding-top: env(safe-area-inset-top); background: #0b0d10; transition: background .3s; }
 .full.hold { background: #065f46; }
+.full.holdB { background: #075985; }
 .full.rest { background: #101c33; }
 .full.overdue { background: #991b1b; }
 .timer-top { padding: 8px 16px 0; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
@@ -106,3 +107,9 @@ svg.chart { width: 100%; height: auto; display: block; }
 .faq-item p { margin: 0 4px 14px; font-size: 15px; line-height: 1.45; color: rgba(255,255,255,.65); }
 .idea-fig { width: 100%; max-width: 260px; height: auto; display: block; margin: 4px auto 10px;
   background: rgba(0,0,0,.25); border-radius: 12px; }
+
+.seg { display: flex; gap: 8px; }
+.segbtn { flex: 1; min-height: 48px; border-radius: 12px; font-size: 14px; font-weight: 900;
+  background: #10141a; border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.4);
+  touch-action: manipulation; }
+.segbtn.on { background: rgba(5,150,105,.2); border-color: rgba(16,185,129,.5); color: #6ee7b7; }

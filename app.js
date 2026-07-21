@@ -69,7 +69,8 @@ function buildWav(beeps, gain = 0.8) {
 }
 
 const PATTERNS = {
-  hold: [[880, 140], [880, 140, 220]],                  // two high beeps → GO, hold now
+  hold: [[880, 140], [880, 140, 220]],                  // two high beeps → GO, hold now (or LEFT)
+  holdB: [[587, 140], [587, 140, 220]],                 // two mid beeps → switch: RIGHT side
   rest: [[392, 420]],                                   // one low note → let go, rest
   done: [[660, 180], [550, 180, 220], [440, 340, 440]], // descending → finished
   ceiling: [[990, 110], [990, 110, 160], [990, 110, 320], [990, 110, 480]],
@@ -206,7 +207,9 @@ function homeHtml() {
     return `
     <div class="card">
       <div class="rname">${esc(r.name)}</div>
-      <div class="rmeta"><span>${r.hold}s hold</span><span>${r.rest}s rest</span><span>≤ ${fmtClock(r.ceiling)} total</span></div>
+      <div class="rmeta">${r.alt
+        ? `<span>${r.hold}s each side</span><span>left ↔ right</span><span>≤ ${fmtClock(r.ceiling)} total</span>`
+        : `<span>${r.hold}s hold</span><span>${r.rest}s rest</span><span>≤ ${fmtClock(r.ceiling)} total</span>`}</div>
       ${r.cue ? `<div class="rcue">${esc(r.cue)}</div>` : ''}
       <div class="rstat">
         ${last == null ? '<span class="ok">Not done yet. Start any time.</span>'
@@ -214,7 +217,7 @@ function homeHtml() {
           : `<span class="wait">Done ${fmtAgo(sinceMs)}. Best to wait ${settings.gapHours}h between sessions.</span>`}
       </div>
       <button class="btn btn-start ${readyAgain ? '' : 'amber'}" data-act="start" data-id="${r.id}">
-        ${readyAgain ? 'START' : 'START ANYWAY'}
+        ${readyAgain ? (r.alt ? 'START · LEFT FIRST' : 'START') : 'START ANYWAY'}
       </button>
       ${ck == null ? `
         <div class="field" style="margin-top:14px">
@@ -296,7 +299,7 @@ const WORKOUT_IDEAS = [
     <path d="M90 88 L65 115 L58 145 L48 150"/>
     <circle cx="122" cy="100" r="9" ${FIG.hl}/>
     ${FIG.close}`,
-   'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.'],
+   'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.\n\nSet the exercise to SWITCH SIDES to do both knees.'],
   ['Wrist: table press hold',
    `${FIG.open}
     <path d="M30 150 H195"/><path d="M95 105 H185"/><path d="M103 105 V150 M177 105 V150" stroke-width="4"/>
@@ -306,7 +309,7 @@ const WORKOUT_IDEAS = [
     <circle cx="122" cy="100" r="7" ${FIG.hl}/>
     <path d="M158 72 V92 M158 92 L154 86 M158 92 L162 86" ${FIG.ar}/>
     ${FIG.close}`,
-   'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.'],
+   'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.\n\nBoth wrists at the same time is fine. Keep BOTH AT ONCE.'],
   ['Hip flexor: seated knee press',
    `${FIG.open}
     <path d="M20 150 H180"/>
@@ -317,7 +320,7 @@ const WORKOUT_IDEAS = [
     <circle cx="104" cy="99" r="7" ${FIG.hl}/>
     <path d="M155 108 V92 M155 92 L151 97 M155 92 L159 97" ${FIG.ar}/>
     ${FIG.close}`,
-   'Sit down. Lift the sore side knee a little. Press your hand down on top of it.\n\nLeg pushes up, hand pushes down. Nothing moves.'],
+   'Sit down. Lift the sore side knee a little. Press your hand down on top of it.\n\nLeg pushes up, hand pushes down. Nothing moves.\n\nSet it to SWITCH SIDES. Left, then right, one at a time.'],
   ['Glutes / side of hip: bridge hold',
    `${FIG.open}
     <path d="M15 145 H185"/>
@@ -346,6 +349,8 @@ const HOW_TO = [
    'HOLD (green): gently tense the area for 30 seconds. Like pressing lightly against something that doesn’t move.\n\nREST (blue): let go completely for 60 seconds.\n\nThe app repeats this until 10 minutes are up.'],
   ['What is the NONSTOP button?',
    'On: the timer moves to the next hold or rest by itself.\n\nOff: it beeps and waits for your tap. Good if you need a second to get in position.'],
+  ['What does SWITCH SIDES mean?',
+   'For body parts you have two of. Wrists, knees, hips.\n\nIf you can do both at once, keep BOTH AT ONCE. Normal timer.\n\nIf both at once is too hard, pick SWITCH SIDES when you edit the exercise. The screen says HOLD LEFT, then HOLD RIGHT, then rest. One side always rests while the other works.'],
   ['What is the 0–10 question?',
    'Once a day, tap how that spot feels. 0 is perfect, 10 is the worst.\n\nIt builds your chart on the Trends page, so you can see it getting better over the weeks.'],
   ['What is the fire 🔥 thing?',
@@ -428,6 +433,17 @@ function renderEditor() {
           <input id="f-hold" type="number" inputmode="numeric" value="${r.hold ?? 30}"></div>
         <div class="field"><label>Rest: seconds between holds</label>
           <input id="f-rest" type="number" inputmode="numeric" value="${r.rest ?? 60}"></div>
+        <div class="field"><label>One side or both?</label>
+          <div class="seg">
+            <button class="segbtn ${r.alt ? '' : 'on'}" data-act="pick-alt" data-alt="0">BOTH AT ONCE</button>
+            <button class="segbtn ${r.alt ? 'on' : ''}" data-act="pick-alt" data-alt="1">SWITCH SIDES</button>
+          </div>
+          <p class="small" style="margin-top:6px">
+            Both at once: normal timer. Two wrists together counts.<br>
+            Switch sides: the timer says LEFT, then RIGHT, then rest.
+            Use it when doing both at once is too hard, like hips or split squats.
+          </p>
+        </div>
         <div class="field"><label>Reminder to yourself (optional)</label>
           <textarea id="f-cue" rows="3" placeholder="e.g. keep it pain-free, small angle">${esc(r.cue || '')}</textarea></div>
         <button class="btn btn-start" data-act="save-edit">SAVE</button>
@@ -448,10 +464,12 @@ function startRun(routine, resume) {
     phaseStart: now,
     sessionStart: now,
     rounds: 0,
+    roundsB: 0,
     overtime: 0,
     pausedAt: null,
     cued: false,
   };
+  runner.roundsB = runner.roundsB || 0;
   runner.routine = routine;
   runner.nonstop = store.get('nonstop', false);
   runner.sound = true;
@@ -466,22 +484,36 @@ function startRun(routine, resume) {
 
 const snapOf = (r) => ({
   routineId: r.routineId, phase: r.phase, phaseStart: r.phaseStart,
-  sessionStart: r.sessionStart, rounds: r.rounds, overtime: r.overtime, pausedAt: r.pausedAt,
+  sessionStart: r.sessionStart, rounds: r.rounds, roundsB: r.roundsB,
+  overtime: r.overtime, pausedAt: r.pausedAt,
 });
 
-function durOf(r) { return r.phase === 'hold' ? r.routine.hold : r.routine.rest; }
+// SWITCH SIDES (routine.alt): LEFT hold → RIGHT hold → shared rest → LEFT…
+// Shared rest = rest minus hold, so each side still gets the full rest off
+// while the block keeps moving (same math as the main workout app).
+function durOf(r) {
+  if (r.phase === 'rest') {
+    return r.routine.alt ? Math.max(0, r.routine.rest - r.routine.hold) : r.routine.rest;
+  }
+  return r.routine.hold;
+}
+
+function nextPhaseOf(r) {
+  if (!r.routine.alt) return r.phase === 'hold' ? 'rest' : 'hold';
+  if (r.phase === 'hold') return 'holdB';
+  if (r.phase === 'holdB') return (r.routine.rest - r.routine.hold > 0) ? 'rest' : 'hold';
+  return 'hold';
+}
 
 function stepPhase(r, at, countOvertime) {
-  if (r.phase === 'hold') {
-    r.rounds += 1;
+  if (r.phase === 'hold' || r.phase === 'holdB') {
+    if (r.phase === 'hold') r.rounds += 1; else r.roundsB += 1;
     if (countOvertime) {
       const over = (at - r.phaseStart) / 1000 - r.routine.hold;
       if (over > 0.5) r.overtime += Math.round(over);
     }
-    r.phase = 'rest';
-  } else {
-    r.phase = 'hold';
   }
+  r.phase = nextPhaseOf(r);
 }
 
 function advanceTap() {
@@ -501,22 +533,25 @@ function endRun(ceilingHit) {
   if (!r) return;
   const now = Date.now();
   // count the in-progress hold if it reached full duration (never while paused)
-  let rounds = r.rounds;
-  if (!r.pausedAt && r.phase === 'hold' && (now - r.phaseStart) / 1000 >= r.routine.hold) rounds += 1;
+  let rounds = r.rounds, roundsB = r.roundsB;
+  const held = !r.pausedAt && (now - r.phaseStart) / 1000 >= r.routine.hold;
+  if (held && r.phase === 'hold') rounds += 1;
+  if (held && r.phase === 'holdB') roundsB += 1;
   const total = Math.round((now - r.sessionStart) / 1000);
   dropWakeLock();
   store.del(SNAP_KEY);
   // Save immediately — never gate the log on another tap.
-  if (rounds > 0 || total >= 30) {
+  const saved = rounds + roundsB > 0 || total >= 30;
+  if (saved) {
     const sessions = store.get('sessions', []);
     sessions.push({
       id: uid(), routineId: r.routineId, date: todayStr(r.sessionStart),
-      startedAt: r.sessionStart, totalSec: total, rounds, overtimeSec: r.overtime,
+      startedAt: r.sessionStart, totalSec: total, rounds, roundsB, overtimeSec: r.overtime,
     });
     store.set('sessions', sessions);
   }
   if (r.sound) playCue('done');
-  doneInfo = { name: r.routine.name, rounds, total, ceilingHit, saved: rounds > 0 || total >= 30 };
+  doneInfo = { name: r.routine.name, alt: !!r.routine.alt, rounds, roundsB, total, ceilingHit, saved };
   runner = null;
   render();
 }
@@ -549,7 +584,7 @@ function timerTick() {
       store.set(SNAP_KEY, snapOf(r));
     } else if (!r.cued) {
       r.cued = true;
-      if (r.sound) playCue(r.phase === 'hold' ? 'rest' : 'hold'); // bell = act now, tap it in
+      if (r.sound) playCue(nextPhaseOf(r)); // bell = act now, tap it in
     }
   }
 }
@@ -566,7 +601,13 @@ function renderTimer() {
   const sessionElapsed = (now - r.sessionStart) / 1000; // total clock never pauses
   const nearCeiling = sessionElapsed >= r.routine.ceiling - 90;
   const overdue = remaining <= 0 && !r.nonstop;
-  const bgClass = overdue ? 'overdue' : r.phase === 'hold' ? 'hold' : 'rest';
+  const isHold = r.phase !== 'rest';
+  const bgClass = overdue ? 'overdue' : r.phase === 'hold' ? 'hold' : r.phase === 'holdB' ? 'holdB' : 'rest';
+  const phaseWord = r.phase === 'rest' ? 'REST'
+    : r.routine.alt ? (r.phase === 'hold' ? 'HOLD LEFT' : 'HOLD RIGHT') : 'HOLD';
+  const roundNow = r.routine.alt
+    ? `L ${r.rounds + (r.phase === 'hold' ? 1 : 0)} · R ${r.roundsB + (r.phase === 'holdB' ? 1 : 0)}`
+    : `ROUND ${r.rounds + (r.phase === 'hold' ? 1 : 0)}`;
 
   app.innerHTML = `
     <div class="full ${bgClass}">
@@ -578,10 +619,10 @@ function renderTimer() {
         </div>
       </div>
       <button class="timer-mid" data-act="t-tap">
-        <div class="phase-word">${paused ? 'PAUSED' : r.phase === 'hold' ? 'HOLD' : 'REST'}</div>
+        <div class="phase-word">${paused ? 'PAUSED' : phaseWord}</div>
         <div class="count">${overdue ? `+${over}` : Math.max(0, remaining)}</div>
-        ${overdue && !paused ? `<div class="tapnow">${r.phase === 'hold' ? 'TIME — LET GO & TAP' : 'GO — TAP WHEN HOLDING'}</div>` : ''}
-        <div class="round">ROUND ${r.rounds + (r.phase === 'hold' ? 1 : 0)}</div>
+        ${overdue && !paused ? `<div class="tapnow">${isHold ? 'TIME — LET GO & TAP' : 'GO — TAP WHEN HOLDING'}</div>` : ''}
+        <div class="round">${roundNow}</div>
         <div class="elapsed ${nearCeiling ? 'warn' : ''}">${fmtClock(sessionElapsed)} / ${fmtClock(r.routine.ceiling)}</div>
         ${nearCeiling ? '<div class="ceiling-warn">ALMOST DONE — 10 MIN IS THE LIMIT</div>' : ''}
       </button>
@@ -609,12 +650,14 @@ function updateTimerNumbers() {
   const over = Math.max(0, Math.floor(phaseElapsed - dur));
   const overdue = remaining <= 0 && !r.nonstop;
   const full = app.querySelector('.full');
-  const want = overdue ? 'overdue' : r.phase === 'hold' ? 'hold' : 'rest';
+  const want = overdue ? 'overdue' : r.phase === 'hold' ? 'hold' : r.phase === 'holdB' ? 'holdB' : 'rest';
   if (!full.classList.contains(want)) { render(); return; }
   const count = app.querySelector('.count');
   const word = app.querySelector('.phase-word');
   if (count) count.textContent = overdue ? `+${over}` : String(Math.max(0, remaining));
-  if (word) word.textContent = paused ? 'PAUSED' : r.phase === 'hold' ? 'HOLD' : 'REST';
+  if (word) word.textContent = paused ? 'PAUSED'
+    : r.phase === 'rest' ? 'REST'
+    : r.routine.alt ? (r.phase === 'hold' ? 'HOLD LEFT' : 'HOLD RIGHT') : 'HOLD';
   const el = app.querySelector('.elapsed');
   if (el) el.textContent = `${fmtClock((Date.now() - r.sessionStart) / 1000)} / ${fmtClock(r.routine.ceiling)}`;
   const tap = app.querySelector('.tapnow');
@@ -629,7 +672,7 @@ function renderDone() {
       <div class="timer-mid" style="text-align:center;padding:24px">
         <div class="phase-word" style="color:#6ee7b7">DONE ✓</div>
         <div class="round">${esc(d.name)}</div>
-        <div class="elapsed">${d.rounds} rounds · ${fmtClock(d.total)}</div>
+        <div class="elapsed">${d.alt ? `L ${d.rounds} · R ${d.roundsB} holds` : `${d.rounds} rounds`} · ${fmtClock(d.total)}</div>
         ${d.ceilingHit ? '<div class="ceiling-warn" style="margin-top:12px">Hit the 10 minute limit. That\'s the plan working, not a problem.</div>' : ''}
         ${d.saved ? '<div class="small" style="margin-top:12px">Saved automatically.</div>'
                    : '<div class="small" style="margin-top:12px">Too short to count. Not saved.</div>'}
@@ -696,6 +739,14 @@ app.addEventListener('click', (e) => {
   else if (act === 'new') { editing = {}; render(); }
   else if (act === 'edit') { editing = { ...routines.find((x) => x.id === btn.dataset.id) }; render(); }
   else if (act === 'cancel-edit') { editing = null; render(); }
+  else if (act === 'pick-alt') {
+    editing.alt = btn.dataset.alt === '1' ? 1 : 0;
+    editing.name = document.getElementById('f-name').value;
+    editing.hold = Number(document.getElementById('f-hold').value) || 30;
+    editing.rest = Number(document.getElementById('f-rest').value) || 60;
+    editing.cue = document.getElementById('f-cue').value;
+    render();
+  }
   else if (act === 'save-edit') {
     const name = document.getElementById('f-name').value.trim();
     if (!name) return;
@@ -705,6 +756,7 @@ app.addEventListener('click', (e) => {
       hold: Math.max(5, Number(document.getElementById('f-hold').value) || 30),
       rest: Math.max(5, Number(document.getElementById('f-rest').value) || 60),
       ceiling: editing.ceiling || 600,
+      alt: editing.alt ? 1 : 0,
       cue: document.getElementById('f-cue').value.trim(),
     };
     const next = editing.id ? routines.map((x) => (x.id === r.id ? r : x)) : [...routines, r];
