@@ -239,7 +239,7 @@ function homeHtml() {
       <button class="btn btn-start" data-act="new">NAME MY EXERCISE</button>
     </div>` : '';
 
-  return `${streakCard}${quickStartHtml()}${emptyState}${cards}
+  return `${streakCard}${emptyState}${cards}
     ${routines.length ? '<button class="btn btn-ghost" data-act="new">+ Add another exercise</button>' : ''}
     ${helpHtml()}
     <p class="small center" style="padding: 8px 12px 20px">
@@ -398,6 +398,7 @@ function ideasHtml() {
 
 function helpHtml() {
   return `
+    ${quickStartHtml()}
     ${ideasHtml()}
     <div class="card">
       <div class="rname">FAQ: the why behind it</div>

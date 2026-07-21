@@ -1,7 +1,7 @@
 // Cache-first service worker: after the first visit the whole app lives on the
 // device and runs with no server at all (airplane mode included). Bump VERSION
 // on every app change or installed phones keep the old copy forever.
-const VERSION = 'rehab-lite-v7';
+const VERSION = 'rehab-lite-v8';
 const FILES = ['./', 'app.js', 'style.css', 'manifest.json', 'icon-180.png', 'icon-512.png'];
 
 self.addEventListener('install', (e) => {
