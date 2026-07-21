@@ -299,11 +299,12 @@ const WORKOUT_IDEAS = [
    'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.'],
   ['Wrist: table press hold',
    `${FIG.open}
-    <path d="M40 150 H195"/><path d="M60 105 H185"/><path d="M70 105 V150 M175 105 V150" stroke-width="4"/>
-    <circle cx="40" cy="30" r="9"/><path d="M44 38 L60 62"/>
-    <path d="M60 62 L88 78 L120 98"/><path d="M120 98 L142 104"/>
-    <circle cx="124" cy="99" r="7" ${FIG.hl}/>
-    <path d="M155 72 V92 M155 92 L151 86 M155 92 L159 86" ${FIG.ar}/>
+    <path d="M30 150 H195"/><path d="M95 105 H185"/><path d="M103 105 V150 M177 105 V150" stroke-width="4"/>
+    <circle cx="52" cy="30" r="9"/><path d="M56 38 L72 90"/>
+    <path d="M72 90 L80 120 L78 148"/><path d="M72 90 L62 120 L58 148"/>
+    <path d="M58 45 L90 72 L118 98"/><path d="M118 98 L140 104"/>
+    <circle cx="122" cy="100" r="7" ${FIG.hl}/>
+    <path d="M158 72 V92 M158 92 L154 86 M158 92 L162 86" ${FIG.ar}/>
     ${FIG.close}`,
    'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.'],
   ['Hip flexor: seated knee press',
@@ -329,12 +330,12 @@ const WORKOUT_IDEAS = [
    'Lie on your back, knees bent. Lift your hips a little and hold.\n\nSore on the outside of the hip is usually a glute tendon. This is real and this helps.\n\nNew hip? Keep it tiny, and clear it with your doctor.'],
   ['Elbow / triceps: table push down',
    `${FIG.open}
-    <path d="M20 150 H180"/><path d="M110 100 H180"/><path d="M118 100 V150 M170 100 V150" stroke-width="4"/>
-    <circle cx="70" cy="25" r="9"/><path d="M70 34 V95"/>
-    <path d="M70 95 L64 148 M70 95 L78 148"/>
-    <path d="M70 48 L95 72 L128 97"/>
-    <path d="M75 44 L99 67" ${FIG.hl}/>
-    <path d="M145 70 V90 M145 90 L141 84 M145 90 L149 84" ${FIG.ar}/>
+    <path d="M20 150 H180"/><path d="M105 90 H180"/><path d="M113 90 V150 M172 90 V150" stroke-width="4"/>
+    <circle cx="72" cy="25" r="9"/><path d="M72 34 V95"/>
+    <path d="M72 95 L65 148 M72 95 L80 148"/>
+    <path d="M72 48 L88 80 L132 88"/>
+    <path d="M66 52 L81 82" ${FIG.hl}/>
+    <path d="M148 60 V80 M148 80 L144 74 M148 80 L152 74" ${FIG.ar}/>
     ${FIG.close}`,
    'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.'],
 ];
