@@ -341,6 +341,17 @@ const WORKOUT_IDEAS = [
     <path d="M148 60 V80 M148 80 L144 74 M148 80 L152 74" ${FIG.ar}/>
     ${FIG.close}`,
    'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.'],
+  ['Forearm: all fours press',
+   `${FIG.open}
+    <path d="M20 150 H180"/>
+    <circle cx="52" cy="68" r="9"/>
+    <path d="M64 78 L125 85"/>
+    <path d="M68 79 L66 148"/><path d="M56 148 H82"/>
+    <path d="M125 85 L142 146"/><path d="M142 146 L172 148"/>
+    <path d="M67 112 L66 144" ${FIG.hl}/>
+    <path d="M98 115 V135 M98 135 L94 129 M98 135 L102 129" ${FIG.ar}/>
+    ${FIG.close}`,
+   'On all fours, like the start of cat cow. Knees down, arms straight.\n\nPress your hands into the ground. Spread the pressure evenly through your fingers.\n\nLean in a touch until you barely feel the forearms. Hold still.'],
   ['Grip 🥋: the no hang (beast mode)',
    `${FIG.open}
     <path d="M20 150 H180"/>
