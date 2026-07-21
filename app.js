@@ -148,6 +148,7 @@ let tab = 'home';
 let editing = null;      // routine being edited ({} = new)
 let runner = null;       // live timer state
 let doneInfo = null;     // post-session summary
+let prestart = null;     // routine waiting on the "here's how" screen
 let repaintTimer = null;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
@@ -166,6 +167,7 @@ function render() {
   if (repaintTimer) { clearInterval(repaintTimer); repaintTimer = null; }
   if (runner) return renderTimer();
   if (doneInfo) return renderDone();
+  if (prestart) return renderPrestart();
   if (editing) return renderEditor();
   app.innerHTML = `
     <div class="header"><h1>TENDON REHAB &amp; STRENGTHEN</h1><span class="small">${todayStr()}</span></div>
@@ -278,6 +280,8 @@ const FIG = {
   ar: 'stroke="#38bdf8" stroke-width="4"',
 };
 
+// 4th element: preset info for the add-exercise dropdown — key (stored on the
+// routine), short name, and default sides mode.
 const WORKOUT_IDEAS = [
   ['Achilles: standing calf hold',
    `${FIG.open}
@@ -289,7 +293,8 @@ const WORKOUT_IDEAS = [
     <path d="M102 122 L94 144" ${FIG.hl}/>
     <path d="M82 142 V122 M82 122 L78 128 M82 122 L86 128" ${FIG.ar}/>
     ${FIG.close}`,
-   'Stand on the sore leg and lift the heel off the floor. Hold the wall for balance.\n\nHold still. 2 out of 10.'],
+   'Stand on the sore leg and lift the heel off the floor. Hold the wall for balance.\n\nHold still. 2 out of 10.',
+   { key: 'achilles', name: 'Achilles', alt: 0 }],
   ['Knee: split squat hold',
    `${FIG.open}
     <path d="M15 150 H185"/>
@@ -299,7 +304,8 @@ const WORKOUT_IDEAS = [
     <path d="M90 88 L65 115 L58 145 L48 150"/>
     <circle cx="122" cy="100" r="9" ${FIG.hl}/>
     ${FIG.close}`,
-   'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.\n\nSet the exercise to SWITCH SIDES to do both knees.'],
+   'Sore leg in front, knee bent. Sink until you feel light effort.\n\nHold still. Works for the knee, and for the Achilles too.\n\nSet the exercise to SWITCH SIDES to do both knees.',
+   { key: 'knee', name: 'Knee', alt: 1 }],
   ['Wrist: table press hold',
    `${FIG.open}
     <path d="M30 150 H195"/><path d="M95 105 H185"/><path d="M103 105 V150 M177 105 V150" stroke-width="4"/>
@@ -309,7 +315,8 @@ const WORKOUT_IDEAS = [
     <circle cx="122" cy="100" r="7" ${FIG.hl}/>
     <path d="M158 72 V92 M158 92 L154 86 M158 92 L162 86" ${FIG.ar}/>
     ${FIG.close}`,
-   'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.\n\nBoth wrists at the same time is fine. Keep BOTH AT ONCE.'],
+   'Palm flat on a table, arm set up like a push up. Lean in until you barely feel it.\n\nIf a push up position is what hurts, this is the one. Do it at 1 out of 10.\n\nBoth wrists at the same time is fine. Keep BOTH AT ONCE.',
+   { key: 'wrist', name: 'Wrist', alt: 0 }],
   ['Hip flexor: seated knee press',
    `${FIG.open}
     <path d="M20 150 H180"/>
@@ -320,7 +327,8 @@ const WORKOUT_IDEAS = [
     <circle cx="104" cy="99" r="7" ${FIG.hl}/>
     <path d="M155 108 V92 M155 92 L151 97 M155 92 L159 97" ${FIG.ar}/>
     ${FIG.close}`,
-   'Sit down. Lift the sore side knee a little. Press your hand down on top of it.\n\nLeg pushes up, hand pushes down. Nothing moves.\n\nSet it to SWITCH SIDES. Left, then right, one at a time.'],
+   'Sit down. Lift the sore side knee a little. Press your hand down on top of it.\n\nLeg pushes up, hand pushes down. Nothing moves.\n\nSet it to SWITCH SIDES. Left, then right, one at a time.',
+   { key: 'hipflexor', name: 'Hip flexor', alt: 1 }],
   ['Glutes / side of hip: bridge hold',
    `${FIG.open}
     <path d="M15 145 H185"/>
@@ -330,7 +338,8 @@ const WORKOUT_IDEAS = [
     <circle cx="112" cy="108" r="8" ${FIG.hl}/>
     <path d="M118 95 V78 M118 78 L114 84 M118 78 L122 84" ${FIG.ar}/>
     ${FIG.close}`,
-   'Lie on your back, knees bent. Lift your hips a little and hold.\n\nSore on the outside of the hip is usually a glute tendon. This is real and this helps.\n\nNew hip? Keep it tiny, and clear it with your doctor.'],
+   'Lie on your back, knees bent. Lift your hips a little and hold.\n\nSore on the outside of the hip is usually a glute tendon. This is real and this helps.\n\nNew hip? Keep it tiny, and clear it with your doctor.',
+   { key: 'glutes', name: 'Glutes', alt: 0 }],
   ['Elbow / triceps: table push down',
    `${FIG.open}
     <path d="M20 150 H180"/><path d="M105 90 H180"/><path d="M113 90 V150 M172 90 V150" stroke-width="4"/>
@@ -340,7 +349,8 @@ const WORKOUT_IDEAS = [
     <path d="M66 52 L81 82" ${FIG.hl}/>
     <path d="M148 60 V80 M148 80 L144 74 M148 80 L152 74" ${FIG.ar}/>
     ${FIG.close}`,
-   'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.'],
+   'Elbow bent 90 degrees. Press your fist down into a table.\n\nHold still. You should barely feel the back of your arm.',
+   { key: 'triceps', name: 'Triceps', alt: 0 }],
   ['Forearm: all fours press',
    `${FIG.open}
     <path d="M20 150 H180"/>
@@ -351,7 +361,8 @@ const WORKOUT_IDEAS = [
     <path d="M67 112 L66 144" ${FIG.hl}/>
     <path d="M98 115 V135 M98 135 L94 129 M98 135 L102 129" ${FIG.ar}/>
     ${FIG.close}`,
-   'On all fours, like the start of cat cow. Knees down, arms straight.\n\nPress your hands into the ground. Spread the pressure evenly through your fingers.\n\nLean in a touch until you barely feel the forearms. Hold still.'],
+   'On all fours, like the start of cat cow. Knees down, arms straight.\n\nPress your hands into the ground. Spread the pressure evenly through your fingers.\n\nLean in a touch until you barely feel the forearms. Hold still.',
+   { key: 'forearm', name: 'Forearm', alt: 0 }],
   ['Grip 🥋: the no hang (beast mode)',
    `${FIG.open}
     <path d="M20 150 H180"/>
@@ -362,8 +373,12 @@ const WORKOUT_IDEAS = [
     <circle cx="116" cy="28" r="6" ${FIG.hl}/><circle cx="128" cy="28" r="6" ${FIG.hl}/>
     <path d="M145 42 V60 M145 60 L141 54 M145 60 L149 54" ${FIG.ar}/>
     ${FIG.close}`,
-   'This one is not rehab. This one is for grip.\n\nGrab a door frame, a ledge, or a pull up bar. Pull down with your fingers, but your feet never leave the floor. A pull up where you never go up.\n\nPull firm, nowhere near max. Light is the trick.\n\nA pro climber tested this exact routine, 10 minutes twice a day. His grip went up 19 kilos in 30 days. About 40 percent more load.\n\nJiu jitsu people: this is grip fighting fuel. Same timer, same 2 a day. Beast mode, gently.'],
+   'This one is not rehab. This one is for grip.\n\nGrab a door frame, a ledge, or a pull up bar. Pull down with your fingers, but your feet never leave the floor. A pull up where you never go up.\n\nPull firm, nowhere near max. Light is the trick.\n\nA pro climber tested this exact routine, 10 minutes twice a day. His grip went up 19 kilos in 30 days. About 40 percent more load.\n\nJiu jitsu people: this is grip fighting fuel. Same timer, same 2 a day. Beast mode, gently.',
+   { key: 'grip', name: 'Grip (no hang)', alt: 0 }],
 ];
+
+const PRESETS = WORKOUT_IDEAS.map(([title, svg, text, meta]) => ({ title, svg, text, ...meta }));
+const presetByKey = (k) => PRESETS.find((p) => p.key === k) || null;
 const HOW_TO = [
   ['How do I start?',
    'Tap NAME MY EXERCISE and type the body part. Wrist, elbow, knee, anything.\n\nTap START. Green means gently tense that spot. Blue means relax.\n\nThe beeps say the same thing, so you don’t have to watch the screen.'],
@@ -446,12 +461,24 @@ function helpHtml() {
 function renderEditor() {
   const r = editing;
   const isNew = !r.id;
+  const preset = r.presetKey && r.presetKey !== 'custom' ? presetByKey(r.presetKey) : null;
+  const unchosen = isNew && !r.presetKey;
+  const options = [
+    `<option value="" ${unchosen ? 'selected' : ''} disabled>Pick one…</option>`,
+    ...PRESETS.map((p) => `<option value="${p.key}" ${r.presetKey === p.key ? 'selected' : ''}>${p.title}</option>`),
+    `<option value="custom" ${r.presetKey === 'custom' ? 'selected' : ''}>Custom: write my own</option>`,
+  ].join('');
   app.innerHTML = `
     <div class="header"><h1>${isNew ? 'NEW EXERCISE' : 'EDIT'}</h1>
       <button class="small" data-act="cancel-edit">✕ cancel</button></div>
     <div class="main stack">
       <div class="card">
-        <div class="field"><label>Name (what body part / movement)</label>
+        <div class="field"><label>Pick an exercise</label>
+          <select id="f-preset">${options}</select></div>
+        ${preset ? `${preset.svg}${paras(preset.text)}` : ''}
+        ${unchosen ? '<p class="small" style="margin-top:8px">Pick one from the list to see the picture, or choose Custom.</p>' : ''}
+        <div style="${unchosen ? 'display:none' : ''}">
+        <div class="field"><label>Name it (you can change this)</label>
           <input id="f-name" value="${esc(r.name || '')}" placeholder="e.g. Wrist, Elbow, Achilles"></div>
         <div class="field"><label>Hold: seconds of gentle effort</label>
           <input id="f-hold" type="number" inputmode="numeric" value="${r.hold ?? 30}"></div>
@@ -472,8 +499,49 @@ function renderEditor() {
           <textarea id="f-cue" rows="3" placeholder="e.g. keep it pain-free, small angle">${esc(r.cue || '')}</textarea></div>
         <button class="btn btn-start" data-act="save-edit">SAVE</button>
         ${isNew ? '' : '<button class="btn btn-danger" style="margin-top:10px" data-act="delete-routine">Delete this exercise</button>'}
+        </div>
       </div>
     </div>`;
+  const sel = document.getElementById('f-preset');
+  if (sel) sel.onchange = () => {
+    const v = sel.value;
+    editing.presetKey = v;
+    const p = v !== 'custom' ? presetByKey(v) : null;
+    if (p) {
+      editing.name = p.name;
+      editing.hold = 30;
+      editing.rest = 60;
+      editing.alt = p.alt;
+      editing.cue = editing.cue || '';
+    } else {
+      editing.name = editing.name || '';
+    }
+    render();
+  };
+}
+
+/* ---------- pre-start: show how, then OK GO ---------- */
+
+function renderPrestart() {
+  const r = prestart;
+  const p = r.presetKey && r.presetKey !== 'custom' ? presetByKey(r.presetKey) : null;
+  const body = p ? `${p.svg}${paras(p.text)}`
+    : r.cue ? paras(r.cue)
+    : '<p>Gentle tension, hold still.</p><p>2 out of 10. It should feel almost too easy.</p>';
+  return void (app.innerHTML = `
+    <div class="full" style="overflow-y:auto">
+      <div class="timer-top" style="padding-top:16px">
+        <span class="tname" style="font-size:20px;font-weight:900">${esc(r.name)}</span>
+        <button class="mini" data-act="prestart-back">← back</button>
+      </div>
+      <div style="flex:1;padding:12px 20px;overflow-y:auto" class="prestart-body">
+        ${body}
+        ${r.alt ? '<p style="color:#7dd3fc;font-weight:700">Switch sides is on. Left first, the screen tells you when.</p>' : ''}
+      </div>
+      <div class="timer-actions" style="grid-template-columns:1fr">
+        <button style="background:#059669" data-act="prestart-go">OK. GO ${r.alt ? '· LEFT FIRST' : ''}</button>
+      </div>
+    </div>`);
 }
 
 /* ---------- timer ---------- */
@@ -752,8 +820,14 @@ app.addEventListener('click', (e) => {
   if (act === 'tab') { tab = btn.dataset.tab; render(); }
   else if (act === 'start') {
     const r = routines.find((x) => x.id === btn.dataset.id);
-    if (r) startRun(r, null);
+    if (r) { prestart = r; render(); }
   }
+  else if (act === 'prestart-go') {
+    const r = prestart;
+    prestart = null;
+    startRun(r, null);
+  }
+  else if (act === 'prestart-back') { prestart = null; render(); }
   else if (act === 'checkin') {
     const checkins = store.get('checkins', []);
     checkins.push({ date: todayStr(), routineId: btn.dataset.id, score: Number(btn.dataset.score) });
@@ -781,6 +855,7 @@ app.addEventListener('click', (e) => {
       rest: Math.max(5, Number(document.getElementById('f-rest').value) || 60),
       ceiling: editing.ceiling || 600,
       alt: editing.alt ? 1 : 0,
+      presetKey: editing.presetKey || 'custom',
       cue: document.getElementById('f-cue').value.trim(),
     };
     const next = editing.id ? routines.map((x) => (x.id === r.id ? r : x)) : [...routines, r];

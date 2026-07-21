@@ -52,8 +52,16 @@ input, textarea { font: inherit; }
 
 .field { margin-top: 10px; }
 .field label { display: block; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 4px; }
-.field input, .field textarea { width: 100%; border-radius: 10px; background: rgba(0,0,0,.3);
-  border: 1px solid rgba(255,255,255,.12); color: #fff; padding: 12px; font-size: 17px; }
+.field input, .field textarea, .field select { width: 100%; border-radius: 10px; background: rgba(0,0,0,.3);
+  border: 1px solid rgba(255,255,255,.12); color: #fff; padding: 12px; font-size: 17px;
+  -webkit-appearance: none; appearance: none; }
+.field select { background-image: linear-gradient(45deg, transparent 50%, #38bdf8 50%),
+  linear-gradient(135deg, #38bdf8 50%, transparent 50%);
+  background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%;
+  background-size: 6px 6px; background-repeat: no-repeat; }
+
+.prestart-body p { font-size: 16px; line-height: 1.5; color: rgba(255,255,255,.8); margin: 0 0 12px; }
+.prestart-body .idea-fig { max-width: 300px; }
 
 .tabs { position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; background: #12151a;
   border-top: 1px solid rgba(255,255,255,.1); padding-bottom: env(safe-area-inset-bottom); }
