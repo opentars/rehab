@@ -190,7 +190,7 @@ function homeHtml() {
         <span class="fire">🔥</span>
         <div>
           <div class="big ${s.streak > 0 ? '' : 'off'}">${s.streak > 0 ? `${s.streak}-DAY STREAK` : 'NO STREAK YET'}</div>
-          <div class="sub">Goal: ${s.goalPerDay}× a day, ${s.gapHours}+ hours apart — ${s.todayCount}/${s.goalPerDay} today${s.todayHit ? ' ✓' : ''}</div>
+          <div class="sub">Goal: ${s.goalPerDay}× a day, ${s.gapHours}+ hours apart · ${s.todayCount}/${s.goalPerDay} today${s.todayHit ? ' ✓' : ''}</div>
         </div>
       </div>
     </div>`;
@@ -209,9 +209,9 @@ function homeHtml() {
       <div class="rmeta"><span>${r.hold}s hold</span><span>${r.rest}s rest</span><span>≤ ${fmtClock(r.ceiling)} total</span></div>
       ${r.cue ? `<div class="rcue">${esc(r.cue)}</div>` : ''}
       <div class="rstat">
-        ${last == null ? '<span class="ok">Not done yet — start any time</span>'
+        ${last == null ? '<span class="ok">Not done yet. Start any time.</span>'
           : readyAgain ? `<span class="ok">READY</span> <span class="small">last: ${fmtAgo(sinceMs)} · ${todayMine.length} today</span>`
-          : `<span class="wait">Done ${fmtAgo(sinceMs)} — wait ~${settings.gapHours}h between sessions</span>`}
+          : `<span class="wait">Done ${fmtAgo(sinceMs)}. Best to wait ${settings.gapHours}h between sessions.</span>`}
       </div>
       <button class="btn btn-start ${readyAgain ? '' : 'amber'}" data-act="start" data-id="${r.id}">
         ${readyAgain ? 'START' : 'START ANYWAY'}
@@ -231,8 +231,10 @@ function homeHtml() {
     <div class="card">
       <div class="rname">What are you working on?</div>
       <p style="font-size:15px; color: rgba(255,255,255,.7); margin: 8px 0 4px">
-        Name the body part that's bothering you — wrist, elbow, knee, ankle,
-        anything — and the timer takes care of the rest.
+        Name the body part that's bothering you. Wrist, elbow, knee, ankle, anything.
+      </p>
+      <p style="font-size:15px; color: rgba(255,255,255,.7); margin: 0 0 4px">
+        The timer takes care of the rest.
       </p>
       <button class="btn btn-start" data-act="new">NAME MY EXERCISE</button>
     </div>` : '';
@@ -241,58 +243,61 @@ function homeHtml() {
     ${routines.length ? '<button class="btn btn-ghost" data-act="new">+ Add another exercise</button>' : ''}
     ${helpHtml()}
     <p class="small center" style="padding: 8px 12px 20px">
-      The timer beeps even if your phone is on silent. Keep the effort gentle —
-      it should never hurt while you do it.
+      The timer beeps even if your phone is on silent.<br>
+      Keep it gentle. It should never hurt while you do it.
     </p>`;
 }
 
 /* ---------- how-to + FAQ (plain English — family has never heard of any of this) ---------- */
 
+// Copy rules (Boss): no em-dashes, short paragraphs split by blank lines,
+// as few words as possible. helpHtml() renders each blank line as a break.
 const HOW_TO = [
   ['How do I start?',
-   'Tap NAME MY EXERCISE and type the body part that bothers you — wrist, elbow, knee, anything. Then tap START. The screen turns green when it’s time to gently tense that spot, and blue when it’s time to relax. The beeps tell you the same thing, so you don’t have to watch the screen.'],
+   'Tap NAME MY EXERCISE and type the body part. Wrist, elbow, knee, anything.\n\nTap START. Green means gently tense that spot. Blue means relax.\n\nThe beeps say the same thing, so you don’t have to watch the screen.'],
   ['What do HOLD and REST mean?',
-   'HOLD (green, 30 seconds): gently tense the sore area and keep it still — like pressing lightly against something that doesn’t move. REST (blue, 60 seconds): let go completely. That’s the whole exercise. The app repeats it for you until 10 minutes are up.'],
+   'HOLD (green): gently tense the area for 30 seconds. Like pressing lightly against something that doesn’t move.\n\nREST (blue): let go completely for 60 seconds.\n\nThe app repeats this until 10 minutes are up.'],
   ['What is the NONSTOP button?',
-   'With NONSTOP on, the timer moves to the next hold or rest by itself. With it off, it beeps and waits for you to tap the screen — nice if you need a second to get in position.'],
+   'On: the timer moves to the next hold or rest by itself.\n\nOff: it beeps and waits for your tap. Good if you need a second to get in position.'],
   ['What is the 0–10 question?',
-   'Once a day, tap the number for how that body part feels — 0 means perfect, 10 means the worst. It takes one second and builds your chart on the Trends page so you can actually SEE it getting better over the weeks.'],
+   'Once a day, tap how that spot feels. 0 is perfect, 10 is the worst.\n\nIt builds your chart on the Trends page, so you can see it getting better over the weeks.'],
   ['What is the fire 🔥 thing?',
-   'Your streak. The goal is 2 short sessions a day, at least 6 hours apart. Every day you hit that, the streak grows. Consistency is the whole game with tendons.'],
+   'Your streak. The goal is 2 short sessions a day, at least 6 hours apart.\n\nEvery day you hit that, the streak grows. With tendons, showing up is the whole game.'],
   ['Does it work on silent? Offline?',
-   'Yes and yes. The beeps play even when your phone is on silent. And after the first time you open it, the app works with no internet at all. Everything you do stays on YOUR phone — nobody else can see it.'],
+   'Yes to both. The beeps play even on silent.\n\nAfter the first open, it works with no internet.\n\nEverything stays on your phone. Nobody else can see it.'],
 ];
 
 const FAQ = [
   ['How hard should I push?',
-   'Barely — about a 2 out of 10. This is the part nobody believes: healing a tendon is a light switch, not a workout. Gentle tension already flips the switch all the way on. Pushing harder does NOT heal it faster — it can actually set you back. If it hurts while you’re doing it, ease off until it doesn’t.'],
-  ['Why does the timer keep running even if I pause?',
-   'Because your cells don’t pause. The moment you do the first hold, your tendon cells start their response — and that biological clock runs for about 10 minutes whether you’re exercising, resting, or answering the phone. Pausing the countdown doesn’t pause your body, so the big 10-minute clock never stops.'],
+   'Barely. About 2 out of 10.\n\nHealing a tendon is a light switch, not a workout. Gentle tension already flips the switch. Pushing harder does not heal faster, and it can set you back.\n\nIf it hurts while you do it, ease off until it doesn’t.'],
+  ['Why does the timer keep running if I pause?',
+   'Your cells don’t pause.\n\nThe first hold starts a response in the tendon that runs about 10 minutes, whether you’re exercising or answering the phone.\n\nSo the big clock never stops. Pause only pauses the countdown.'],
   ['Why only 10 minutes?',
-   'Research shows tendon cells stop listening after roughly 10 minutes of signaling. Minute 11 adds zero healing — just wear. Short and done beats long and heroic. When the app cuts you off, that’s it working.'],
+   'Tendon cells stop listening after about 10 minutes.\n\nMinute 11 adds no healing, just wear.\n\nWhen the app cuts you off, that’s it working.'],
   ['Why twice a day, 6 hours apart?',
-   'After one 10-minute dose, the cells need about 6 hours to reset before they’ll respond again. Two spaced doses a day does more than one long session ever could. That’s why the app tracks the gap for you.'],
+   'After one 10 minute dose, the cells need about 6 hours to reset.\n\nTwo spaced doses a day beat one long session.'],
   ['How long until it feels better?',
-   'Tendons are slow. Think weeks to a few months, not days. That’s normal — don’t quit at day 5. Watch the Trends chart instead of judging by one bad morning; the line drifting down over weeks is the win.'],
+   'Weeks to a few months. That’s normal for tendons.\n\nDon’t judge by one bad morning. Watch the Trends chart.\n\nThe line drifting down over weeks is the win.'],
   ['What if it hurts while I do it?',
-   'Sharp pain means wrong angle or too much effort — not "no pain no gain." Change the position, lighten up, and stay just under the pain. Mild tension is all it takes.'],
+   'Sharp pain means wrong angle or too much effort.\n\nChange the position and lighten up. Stay just under the pain.'],
   ['Do I need weights or equipment?',
-   'No. Gently pushing against anything that doesn’t move — a table, a wall, your other hand — is enough to flip the healing switch.'],
+   'No. Gently pushing against anything that doesn’t move is enough.\n\nA table, a wall, your other hand.'],
   ['Where does this come from?',
-   'It’s based on tendon research from Dr. Keith Baar’s lab at UC Davis — the short gentle holds, the 10-minute cap, and the spaced doses all come from how tendon cells actually respond to load. The app just does the counting for you.'],
+   'Tendon research from Dr. Keith Baar’s lab at UC Davis.\n\nThe gentle holds, the 10 minute cap, and the spaced doses all come from how tendon cells respond to load.\n\nThe app just does the counting.'],
 ];
 
 function helpHtml() {
+  const paras = (a) => a.split('\n\n').map((p) => `<p>${p}</p>`).join('');
   const items = (list) => list.map(([q, a]) => `
-    <details class="faq-item"><summary>${q}</summary><p>${a}</p></details>`).join('');
+    <details class="faq-item"><summary>${q}</summary>${paras(a)}</details>`).join('');
   return `
     <div class="card">
       <div class="rname">How do I use the app?</div>
       ${items(HOW_TO)}
     </div>
     <div class="card">
-      <div class="rname">FAQ — the why behind it</div>
-      <p class="small" style="margin:6px 0 2px">The rules in this app aren’t random — they come from tendon science. Tap a question.</p>
+      <div class="rname">FAQ: the why behind it</div>
+      <p class="small" style="margin:6px 0 2px">These rules come from tendon science. Tap a question.</p>
       ${items(FAQ)}
     </div>`;
 }
@@ -309,9 +314,9 @@ function renderEditor() {
       <div class="card">
         <div class="field"><label>Name (what body part / movement)</label>
           <input id="f-name" value="${esc(r.name || '')}" placeholder="e.g. Wrist, Elbow, Achilles"></div>
-        <div class="field"><label>Hold — seconds of gentle effort</label>
+        <div class="field"><label>Hold: seconds of gentle effort</label>
           <input id="f-hold" type="number" inputmode="numeric" value="${r.hold ?? 30}"></div>
-        <div class="field"><label>Rest — seconds between holds</label>
+        <div class="field"><label>Rest: seconds between holds</label>
           <input id="f-rest" type="number" inputmode="numeric" value="${r.rest ?? 60}"></div>
         <div class="field"><label>Reminder to yourself (optional)</label>
           <textarea id="f-cue" rows="3" placeholder="e.g. keep it pain-free, small angle">${esc(r.cue || '')}</textarea></div>
@@ -515,9 +520,9 @@ function renderDone() {
         <div class="phase-word" style="color:#6ee7b7">DONE ✓</div>
         <div class="round">${esc(d.name)}</div>
         <div class="elapsed">${d.rounds} rounds · ${fmtClock(d.total)}</div>
-        ${d.ceilingHit ? '<div class="ceiling-warn" style="margin-top:12px">Hit the 10-min limit — that\'s the plan working, not a problem.</div>' : ''}
+        ${d.ceilingHit ? '<div class="ceiling-warn" style="margin-top:12px">Hit the 10 minute limit. That\'s the plan working, not a problem.</div>' : ''}
         ${d.saved ? '<div class="small" style="margin-top:12px">Saved automatically.</div>'
-                   : '<div class="small" style="margin-top:12px">Too short to count — not saved.</div>'}
+                   : '<div class="small" style="margin-top:12px">Too short to count. Not saved.</div>'}
       </div>
       <div class="timer-actions" style="grid-template-columns:1fr">
         <button style="background:#059669" data-act="t-close">OK</button>
