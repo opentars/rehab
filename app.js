@@ -121,8 +121,11 @@ function qualifyingCount(daySessions, gapHours) {
   return count;
 }
 
+// Two-tier: ONE session keeps the day — only a zero day breaks the 🔥 streak.
+// TWO sessions (spaced gapHours apart) build the ⚡ double streak; missing the
+// double resets only the double. Today never breaks anything in progress.
 function streakInfo() {
-  const { goalPerDay, gapHours } = store.get('settings', { goalPerDay: 2, gapHours: 6 });
+  const { gapHours } = store.get('settings', { goalPerDay: 2, gapHours: 6 });
   const sessions = store.get('sessions', []);
   const byDay = new Map();
   for (const s of sessions) {
@@ -130,15 +133,18 @@ function streakInfo() {
     if (!byDay.has(d)) byDay.set(d, []);
     byDay.get(d).push(s);
   }
-  const hit = (d) => qualifyingCount(byDay.get(d) || [], gapHours) >= goalPerDay;
+  const countOn = (d) => qualifyingCount(byDay.get(d) || [], gapHours);
   const today = todayStr();
-  const todayCount = qualifyingCount(byDay.get(today) || [], gapHours);
+  const todayCount = countOn(today);
   const dayMs = 86_400_000;
   const noon = new Date(); noon.setHours(12, 0, 0, 0); // noon anchor avoids DST edges
   const dstr = (i) => todayStr(noon.getTime() - i * dayMs);
-  let streak = 0;
-  for (let i = hit(today) ? 0 : 1; hit(dstr(i)); i++) streak++;
-  return { streak, todayCount, todayHit: hit(today), goalPerDay, gapHours };
+  const chain = (min) => {
+    let n = 0;
+    for (let i = todayCount >= min ? 0 : 1; countOn(dstr(i)) >= min; i++) n++;
+    return n;
+  };
+  return { streak: chain(1), doubleStreak: chain(2), todayCount, todayHit: todayCount >= 1, gapHours };
 }
 
 /* ---------- app state + render ---------- */
@@ -192,8 +198,9 @@ function homeHtml() {
       <div class="streak">
         <span class="fire">🔥</span>
         <div>
-          <div class="big ${s.streak > 0 ? '' : 'off'}">${s.streak > 0 ? `${s.streak}-DAY STREAK` : 'NO STREAK YET'}</div>
-          <div class="sub">Goal: ${s.goalPerDay}× a day, ${s.gapHours}+ hours apart · ${s.todayCount}/${s.goalPerDay} today${s.todayHit ? ' ✓' : ''}</div>
+          <div class="big ${s.streak > 0 ? '' : 'off'}">${s.streak > 0 ? `${s.streak}-DAY STREAK` : 'NO STREAK YET'}${
+            s.doubleStreak > 0 ? ` <span style="font-size:16px;color:#7dd3fc">⚡ double ×${s.doubleStreak}</span>` : ''}</div>
+          <div class="sub">1 a day keeps it · 2 a day builds the double · ${s.todayCount} today${s.todayHit ? ' ✓' : ''}</div>
         </div>
       </div>
     </div>`;
@@ -391,7 +398,7 @@ const HOW_TO = [
   ['What is the 0–10 question?',
    'Once a day, tap how that spot feels. 0 is perfect, 10 is the worst.\n\nIt builds your chart on the Trends page, so you can see it getting better over the weeks.'],
   ['What is the fire 🔥 thing?',
-   'Your streak. The goal is 2 short sessions a day, at least 6 hours apart.\n\nEvery day you hit that, the streak grows. With tendons, showing up is the whole game.'],
+   'Your streak. One session a day keeps it alive. Only a zero day breaks it.\n\nTwo sessions a day, 6 hours apart, builds the ⚡ double streak on top. Miss the double and only the double resets.\n\nWith tendons, showing up is the whole game.'],
   ['Does it work on silent? Offline?',
    'Yes to both. The beeps play even on silent.\n\nAfter the first open, it works with no internet.\n\nEverything stays on your phone. Nobody else can see it.'],
 ];
