@@ -384,6 +384,12 @@ const WORKOUT_IDEAS = [
    { key: 'grip', name: 'Grip (no hang)', alt: 0 }],
 ];
 
+// Catch-all shown ABOVE the per-spot ideas — for anyone whose body part or
+// exact problem isn't drawn below. Boss's rule from the Baar research: take
+// the movement that hurts and turn it into a light still hold.
+const CATCH_ALL = ['👍 Your spot not here? This covers everything',
+  'A shoulder alone can hurt twenty different ways. We can\'t draw every spot. So here is the one rule that covers all of them.\n\nTake the exact movement that bothers you. Do that same movement, but hold it still instead of moving through it.\n\nGet into the position just far enough to barely feel the spot. Then freeze. About 2 out of 10 effort, like 20 percent. Hold 30 seconds, rest, repeat. Same timer as everything else in this app.\n\nExample: a chest fly bugs the front of your shoulder. Get into the fly position with light or no weight and just hold your arms there, still, for 30 seconds. No swinging through the motion. The still hold is what heals. The full motion is what irritates.\n\nStill hurts even holding still and light? Change the angle a little until it doesn\'t, and hold there.\n\nTo use it: NAME MY EXERCISE, pick Custom, and name your spot. Same 10 minutes, 2 times a day.\n\nSame tendon science as the rest of the app (Dr. Keith Baar\'s lab). Healing tendons don\'t need the full motion. They just need gentle, steady tension.'];
+
 const PRESETS = WORKOUT_IDEAS.map(([title, svg, text, meta]) => ({ title, svg, text, ...meta }));
 const presetByKey = (k) => PRESETS.find((p) => p.key === k) || null;
 const HOW_TO = [
@@ -438,12 +444,15 @@ function quickStartHtml() {
 }
 
 function ideasHtml() {
+  const catchall = `
+    <details class="faq-item catchall"><summary>${CATCH_ALL[0]}</summary>${paras(CATCH_ALL[1])}</details>`;
   const items = WORKOUT_IDEAS.map(([title, svg, text]) => `
     <details class="faq-item"><summary>${title}</summary>${svg}${paras(text)}</details>`).join('');
   return `
     <div class="card">
       <div class="rname">Workout ideas: one per spot</div>
       <p class="small" style="margin:6px 0 2px">Tap yours to see the picture. Amber = the sore spot. Blue arrow = the gentle push.</p>
+      ${catchall}
       ${items}
     </div>`;
 }
